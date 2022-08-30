@@ -17,9 +17,9 @@ class App {
   #mapZoomLevel = 13;
   #workouts = [];
 
-
   constructor() {
     this._getPosition();
+    this._getLocalstorage();
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
@@ -146,7 +146,7 @@ class App {
   _renderWorkout(workout) {
     const html = `
       <li class="workout workout--${workout.workoutType}" data-id="${workout.id}">
-        <h2 class="workout__title">${workout._setDescription()}</h2>
+        <h2 class="workout__title">${workout.description}</h2>
         <div class="workout__details">
           <span class="workout__icon">${workout.workoutType === 'running' ? '🏃‍♂️' : '🚴‍♀️'}</span>
           <span class="workout__value">${workout.distance}</span>
@@ -193,9 +193,18 @@ class App {
   } 
 
   _setLocalstorage() {
-    localStorage.setItem('workout', JSON.stringify(this.#workout))
-  }
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+  } 
 
+  _getLocalstorage() {
+    const data = JSON.parse(localStorage.getItem('workouts'));
+    if(!data) return;
+
+    this.#workouts = data;
+    this.#workouts.forEach(workout => {
+      this._renderWorkout(workout);
+    })
+  }
 }
 
 // Application architecture end
