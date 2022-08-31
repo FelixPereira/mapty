@@ -50,6 +50,12 @@ class App {
     
     // Handling click on map
     this.#map.on('click', this._showForm.bind(this));
+
+    // Display workouts markrs on map
+    this.#workouts.forEach(workout => {
+      this._renderWorkoutMarker(workout);
+    })
+    
   }
 
   _showForm(mapE) {
@@ -96,7 +102,6 @@ class App {
       // Add new object to workout array
       workout = new Running(destinationCoords, distance, duration, cadence);
       this.#workouts.push(workout);
-      console.log(workout)
     }
       
     // If activity cycling, create cycling object
@@ -107,7 +112,6 @@ class App {
             
       // Add new object to workout array
       workout = new Cycling(destinationCoords, distance, duration, elevation);
-      console.log(workout);
       this.#workouts.push(workout);
     }
 
@@ -152,6 +156,7 @@ class App {
           <span class="workout__value">${workout.distance}</span>
           <span class="workout__unit">km</span>
         </div>
+
         <div class="workout__details">
           <span class="workout__icon">⏱</span>
           <span class="workout__value">${workout.duration}</span>
@@ -177,10 +182,7 @@ class App {
 
     if(!workoutEl) return;
 
-    // console.log(workoutEl);
-
     const workout = this.#workouts.find(workout => workout.id === workoutEl.dataset.id);
-    console.log(workout);
 
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
       animate: true,
@@ -190,7 +192,7 @@ class App {
     });
 
     workout.click();
-  } 
+  }
 
   _setLocalstorage() {
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
