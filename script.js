@@ -1,6 +1,7 @@
 'use strict';
 
 const form = document.querySelector('.form');
+const closeFormBtn = document.querySelector('.icon--closeForm');
 const containerWorkouts = document.querySelector('.workouts');
 const inputType = document.querySelector('.form__input--type');
 const inputDistance = document.querySelector('.form__input--distance');
@@ -22,7 +23,8 @@ class App {
     this._getLocalstorage();
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
-    containerWorkouts.addEventListener('click', this._deleteWorkout.bind(this));
+    containerWorkouts.addEventListener('click', this._userActions.bind(this));
+    closeFormBtn.addEventListener('click', this.closeForm);
 
     console.log(this.#workouts);
   }
@@ -152,12 +154,11 @@ class App {
   _renderWorkout(workout) {
     const html = `
       <li class="workout workout--${workout.workoutType}" data-id="${workout.id}">
-        
         <div class="workout__header">
           <h2 class="workout__title">${workout.description}</h2>
           <div class="header__icons">
-            <span class="icon__delete">X</span>
-            <span class="icon__delete">X</span>
+            <span class="header__icon icon--edit">&#9998;</span>
+            <span class="header__icon icon--delete">&#10006;</span>
           </div>
         </div>
         
@@ -187,6 +188,10 @@ class App {
       </li>
     `;
     form.insertAdjacentHTML('afterend', html);
+  }
+
+  closeForm() {
+    form.classList.add('hidden');
   }
 
   _moveToPopup(e) {
@@ -220,18 +225,29 @@ class App {
     })
   }
 
-  _deleteWorkout(event) {
-    const workoutEl = event.target.closest('.workout');
-
-    if(!event.target.classList.contains('icon__delete')) return;
-
-    const work = this.#workouts.find(workout => workout.id = workoutEl.dataset.id)
+  _deleteWorkout(workoutEl) {
+    const work = this.#workouts.find(workout => workout.id = workoutEl.dataset.id);
 
     this.#workouts.pop(work);
     this._setLocalstorage();
     location.reload();
+  }
 
-    console.log(this.#workouts);
+  _editWorkout(workoutEl) {
+    const work = this.#workouts.find(workout => workout.id === workoutEl.dataset.id);
+    form.classList.remove('hidden');
+  }
+
+  _userActions(event) {
+    const workoutEl = event.target.closest('.workout');
+
+    if(event.target.classList.contains('icon--delete')) {
+      this._deleteWorkout(workoutEl);
+    }
+
+    if(event.target.classList.contains('icon--edit')) {
+      this._editWorkout(workoutEl);
+    } else return;
   }
 }
 
